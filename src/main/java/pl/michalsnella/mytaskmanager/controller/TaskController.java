@@ -1,14 +1,14 @@
-package pl.michalsnella.todolistapp;
+package pl.michalsnella.mytaskmanager.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import pl.michalsnella.mytaskmanager.model.task.Task;
+import pl.michalsnella.mytaskmanager.service.TaskService;
 
 import java.net.URI;
 
 @RestController
-//@RequestMapping
 public class TaskController {
 
     private final TaskService taskService;
@@ -21,7 +21,6 @@ public class TaskController {
     @GetMapping("tasks")
     public ResponseEntity<Iterable<Task>> getAllTasks() {
         Iterable<Task> tasks = taskService.getAllTasks();
-
         return ResponseEntity.ok(tasks);
     }
 
@@ -35,7 +34,6 @@ public class TaskController {
     @PostMapping("tasks")
     public ResponseEntity<Task> addTask(@RequestBody Task task) {
         Task savedTask = taskService.addTask(task);
-
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedTask.getId())
@@ -58,19 +56,27 @@ public class TaskController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-//    @PatchMapping("tasks/{id}")
-//    public ResponseEntity<Task> archiveTask(@PathVariable Integer id, @RequestBody Task task) {
-//        return taskService.archiveTask(id, task)
-//                .map(ResponseEntity::ok)
-//                .orElseGet(() -> ResponseEntity.notFound().build());
-//    }
-//
-//    @PatchMapping("tasks/{id}")
-//    public ResponseEntity<Task> unArchiveTask(@PathVariable Integer id, @RequestBody Task task) {
-//        return taskService.unArchiveTask(id, task)
-//                .map(ResponseEntity::ok)
-//                .orElseGet(() -> ResponseEntity.notFound().build());
-//    }
+    @PatchMapping("tasks/{id}/archive")
+    public ResponseEntity<Task> archiveTask(@PathVariable Integer id) {
+        return taskService.archiveTask(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
+    @PatchMapping("tasks/{id}/unarchive")
+    public ResponseEntity<Task> unArchiveTask(@PathVariable Integer id) {
+        return taskService.unArchiveTask(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("tasks/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Integer id) {
+        if (taskService.deleteTask(id)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 }

@@ -1,4 +1,4 @@
-package pl.michalsnella.todolistapp;
+package pl.michalsnella.mytaskmanager.model.task;
 
 import jakarta.persistence.*;
 
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Entity
 public class Task {@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private int id;
     private String title;
     private String body;
     @Convert(converter = ExecutionStatusConverter.class)
@@ -16,7 +16,26 @@ public class Task {@Id
     private LocalDateTime timeOfUpdate;
     private boolean isArchived;
 
-    public Task(Integer id, String title, ExecutionStatus executionStatus, LocalDateTime timeOfCreation, boolean archived) {
+    public Task(int id, String title, String body, ExecutionStatus executionStatus, LocalDateTime timeOfCreation, LocalDateTime timeOfUpdate, boolean isArchived) {
+        this.id = id;
+        this.title = title;
+        this.body = body;
+        this.executionStatus = executionStatus;
+        this.timeOfCreation = timeOfCreation;
+        this.timeOfUpdate = timeOfUpdate;
+        this.isArchived = isArchived;
+    }
+
+    public Task(int id, String title, String body, ExecutionStatus executionStatus, LocalDateTime timeOfCreation, boolean isArchived) {
+        this.id = id;
+        this.title = title;
+        this.body = body;
+        this.executionStatus = executionStatus;
+        this.timeOfCreation = timeOfCreation;
+        this.isArchived = isArchived;
+    }
+
+    public Task(int id, String title, ExecutionStatus executionStatus, LocalDateTime timeOfCreation, boolean archived) {
         this.id = id;
         this.title = title;
         this.executionStatus = executionStatus;
@@ -30,14 +49,29 @@ public class Task {@Id
     }
 
     public Task() {
-
     }
 
-    public Integer getId() {
+    @PrePersist
+    protected void onCreate() {
+        if (executionStatus == null) {
+            executionStatus = ExecutionStatus.NEW;
+        }
+        if (timeOfCreation == null) {
+            timeOfCreation = LocalDateTime.now();
+        }
+        isArchived = false;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        timeOfUpdate = LocalDateTime.now();
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 

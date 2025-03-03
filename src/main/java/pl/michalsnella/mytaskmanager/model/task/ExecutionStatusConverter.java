@@ -1,7 +1,8 @@
-package pl.michalsnella.todolistapp;
+package pl.michalsnella.mytaskmanager.model.task;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import pl.michalsnella.mytaskmanager.model.task.ExecutionStatus;
 
 @Converter(autoApply = true)
 public class ExecutionStatusConverter implements AttributeConverter<ExecutionStatus, Integer> {

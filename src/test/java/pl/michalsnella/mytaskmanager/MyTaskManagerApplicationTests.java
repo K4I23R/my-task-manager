@@ -1,4 +1,4 @@
-package pl.michalsnella.todolistapp;
+package pl.michalsnella.mytaskmanager;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

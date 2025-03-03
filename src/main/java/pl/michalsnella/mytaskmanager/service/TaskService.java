@@ -1,8 +1,8 @@
-package pl.michalsnella.todolistapp;
+package pl.michalsnella.mytaskmanager.service;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
+import pl.michalsnella.mytaskmanager.repository.TaskRepository;
+import pl.michalsnella.mytaskmanager.model.task.Task;
 
 import java.util.Optional;
 
@@ -32,7 +32,6 @@ public class TaskService {
                 .map(existingTask -> {
                     existingTask.setTitle(task.getTitle());
                     existingTask.setBody(task.getBody());
-                    existingTask.setTimeOfUpdate(task.getTimeOfUpdate());
                     existingTask.setExecutionStatus(task.getExecutionStatus());
                     existingTask.setIsArchived(task.getIsArchived());
 
@@ -45,28 +44,35 @@ public class TaskService {
                 .map(existingTask -> {
                     if (task.getTitle() != null) existingTask.setTitle(task.getTitle());
                     if (task.getBody() != null) existingTask.setBody(task.getBody());
-                    if (task.getTimeOfUpdate() != null) existingTask.setTimeOfUpdate(task.getTimeOfUpdate());
                     if (task.getExecutionStatus() != null) existingTask.setExecutionStatus(task.getExecutionStatus());
 
                     return taskRepository.save(existingTask);
                 });
     }
 
-    public Optional<Task> archiveTask(Integer id, Task task) {
+    public Optional<Task> archiveTask(Integer id) {
         return taskRepository.findById(id)
                 .map(existingTask -> {
-                    task.setIsArchived(true);
-
+                    existingTask.setIsArchived(true);
                     return taskRepository.save(existingTask);
                 });
     }
 
-    public Optional<Task> unArchiveTask(Integer id, Task task) {
+    public Optional<Task> unArchiveTask(Integer id) {
         return taskRepository.findById(id)
                 .map(existingTask -> {
-                    task.setIsArchived(false);
-
+                    existingTask.setIsArchived(false);
                     return taskRepository.save(existingTask);
                 });
     }
+
+    public boolean deleteTask(Integer id) {
+        if (taskRepository.existsById(id)) {
+            taskRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+
 }

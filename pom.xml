@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>pl.michalsnella</groupId>
 	<artifactId>mytaskmanager</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>todolistapp</name>
-	<description>todolistapp</description>
+	<version>0.0.2-SNAPSHOT</version>
+	<name>mytaskmanager</name>
+	<description>mytaskmanager</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -55,6 +55,14 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.14.2</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -1,4 +1,4 @@
-package pl.michalsnella.todolistapp;
+package pl.michalsnella.mytaskmanager.model.task;
 
 public enum ExecutionStatus {
     NEW(0, "New"),

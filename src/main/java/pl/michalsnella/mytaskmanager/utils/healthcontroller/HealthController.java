@@ -1,4 +1,4 @@
-package pl.michalsnella.todolistapp;
+package pl.michalsnella.mytaskmanager.utils.healthcontroller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
