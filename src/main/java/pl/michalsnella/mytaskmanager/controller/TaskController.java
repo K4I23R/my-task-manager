@@ -9,6 +9,7 @@ import pl.michalsnella.mytaskmanager.service.TaskService;
 import java.net.URI;
 
 @RestController
+@RequestMapping("tasks")
 public class TaskController {
 
     private final TaskService taskService;
@@ -17,66 +18,49 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-
-    @GetMapping("tasks")
+    @GetMapping
     public ResponseEntity<Iterable<Task>> getAllTasks() {
-        Iterable<Task> tasks = taskService.getAllTasks();
-        return ResponseEntity.ok(tasks);
+        return ResponseEntity.ok(taskService.getAllTasks());
     }
 
-    @GetMapping("tasks/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Task> getTask(@PathVariable Integer id) {
-        return taskService.getTask(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(taskService.getTask(id));
     }
 
-    @PostMapping("tasks")
+    @PostMapping
     public ResponseEntity<Task> addTask(@RequestBody Task task) {
         Task savedTask = taskService.addTask(task);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedTask.getId())
                 .toUri();
-
         return ResponseEntity.created(location).body(savedTask);
     }
 
-    @PutMapping("tasks/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable Integer id, @RequestBody Task task) {
-        return taskService.updateTask(id, task)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(taskService.updateTask(id, task));
     }
 
-    @PatchMapping("tasks/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Task> partiallyUpdateTask(@PathVariable Integer id, @RequestBody Task task) {
-        return taskService.partiallyUpdateTask(id, task)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(taskService.partiallyUpdateTask(id, task));
     }
 
-    @PatchMapping("tasks/{id}/archive")
-    public ResponseEntity<Task> archiveTask(@PathVariable Integer id) {
-        return taskService.archiveTask(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    @PatchMapping("/{id}/archive")
+    public ResponseEntity<Task> setArchiveStatus(@PathVariable Integer id, @RequestBody ArchiveRequest request) {
+        return ResponseEntity.ok(taskService.setArchivedStatus(id, request.isArchived()));
     }
 
-    @PatchMapping("tasks/{id}/unarchive")
-    public ResponseEntity<Task> unArchiveTask(@PathVariable Integer id) {
-        return taskService.unArchiveTask(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("tasks/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Integer id) {
-        if (taskService.deleteTask(id)) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleNotFoundException(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }

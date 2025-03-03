@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>pl.michalsnella</groupId>
 	<artifactId>mytaskmanager</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>mytaskmanager</name>
 	<description>mytaskmanager</description>
 	<url/>

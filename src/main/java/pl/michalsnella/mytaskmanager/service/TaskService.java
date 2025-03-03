@@ -4,8 +4,6 @@ import org.springframework.stereotype.Service;
 import pl.michalsnella.mytaskmanager.repository.TaskRepository;
 import pl.michalsnella.mytaskmanager.model.task.Task;
 
-import java.util.Optional;
-
 @Service
 public class TaskService {
 
@@ -19,60 +17,55 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
-    public Optional<Task> getTask(int id) {
-        return taskRepository.findById(id);
+    public Task getTask(int id) {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Task with ID " + id + " not found"));
     }
 
     public Task addTask(Task task) {
         return taskRepository.save(task);
     }
 
-    public Optional<Task> updateTask(Integer id, Task task) {
+    public Task updateTask(Integer id, Task updatedTask) {
         return taskRepository.findById(id)
-                .map(existingTask -> {
-                    existingTask.setTitle(task.getTitle());
-                    existingTask.setBody(task.getBody());
-                    existingTask.setExecutionStatus(task.getExecutionStatus());
-                    existingTask.setIsArchived(task.getIsArchived());
-
-                    return taskRepository.save(existingTask);
-                });
+                .map(existingTask -> applyUpdates(existingTask, updatedTask))
+                .orElseThrow(() -> new IllegalArgumentException("Task with ID " + id + " not found"));
     }
 
-    public Optional<Task> partiallyUpdateTask(Integer id, Task task) {
+    public Task partiallyUpdateTask(Integer id, Task partialUpdate) {
         return taskRepository.findById(id)
-                .map(existingTask -> {
-                    if (task.getTitle() != null) existingTask.setTitle(task.getTitle());
-                    if (task.getBody() != null) existingTask.setBody(task.getBody());
-                    if (task.getExecutionStatus() != null) existingTask.setExecutionStatus(task.getExecutionStatus());
-
-                    return taskRepository.save(existingTask);
-                });
+                .map(existingTask -> applyPartialUpdates(existingTask, partialUpdate))
+                .orElseThrow(() -> new IllegalArgumentException("Task with ID " + id + " not found"));
     }
 
-    public Optional<Task> archiveTask(Integer id) {
+    public Task setArchivedStatus(Integer id, boolean isArchived) {
         return taskRepository.findById(id)
-                .map(existingTask -> {
-                    existingTask.setIsArchived(true);
-                    return taskRepository.save(existingTask);
-                });
+                .map(task -> {
+                    task.setIsArchived(isArchived);
+                    return taskRepository.save(task);
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Task with ID " + id + " not found"));
     }
 
-    public Optional<Task> unArchiveTask(Integer id) {
-        return taskRepository.findById(id)
-                .map(existingTask -> {
-                    existingTask.setIsArchived(false);
-                    return taskRepository.save(existingTask);
-                });
-    }
-
-    public boolean deleteTask(Integer id) {
-        if (taskRepository.existsById(id)) {
-            taskRepository.deleteById(id);
-            return true;
+    public void deleteTask(Integer id) {
+        if (!taskRepository.existsById(id)) {
+            throw new IllegalArgumentException("Task with ID " + id + " not found");
         }
-        return false;
+        taskRepository.deleteById(id);
     }
 
+    private Task applyUpdates(Task existingTask, Task updatedTask) {
+        existingTask.setTitle(updatedTask.getTitle());
+        existingTask.setBody(updatedTask.getBody());
+        existingTask.setExecutionStatus(updatedTask.getExecutionStatus());
+        existingTask.setIsArchived(updatedTask.getIsArchived());
+        return taskRepository.save(existingTask);
+    }
 
+    private Task applyPartialUpdates(Task existingTask, Task partialUpdate) {
+        if (partialUpdate.getTitle() != null) existingTask.setTitle(partialUpdate.getTitle());
+        if (partialUpdate.getBody() != null) existingTask.setBody(partialUpdate.getBody());
+        if (partialUpdate.getExecutionStatus() != null) existingTask.setExecutionStatus(partialUpdate.getExecutionStatus());
+        return taskRepository.save(existingTask);
+    }
 }
